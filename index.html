@@ -884,7 +884,7 @@ $('zOut').onclick=function(){if(state.view==='sky'){skyZoom(1/0.7);return;}state
 function tap(it){
   if(state.view==='deep'){if(it&&!it.ring)exSelect(it.key,false);return;}
   if(state.view==='lg'){if(it&&it.gal)enterGalaxy(it.gal.id);else if(it&&it.viz)lgFocus(it);return;}
-  if(state.view==='gal'){if(it&&!it.ring)galSelect(it.key,false);return;}
+  if(state.view==='gal'){if(it&&!it.ring)galSelect(it.key,true);return;}
   if(state.view==='cons3d')return;
   if(state.view==='near'){
     if(!it)return;
@@ -2029,7 +2029,7 @@ function buildGal(){
 /* ---- rótulos com anti-colisão: prioridade, zoom e o selecionado sempre primeiro ---- */
 function placeLabels(v,key){
   var placed=[],c=cam[v],list=labels.slice();
-  list.forEach(function(l){var it=l.it;l.score=(it.key===key?1e6:0)+(it.pr||0)-(v==='gal'&&(it.pr||0)<20&&c.r>18?1000:0)-(v==='lg'&&!it.gal&&!it.ring&&(it.pr||0)<(c.r>3000?7.5:c.r>1500?5:2)?1000:0);});
+  list.forEach(function(l){var it=l.it;l.score=(it.key===key?1e6:0)+(it.pr||0)-(v==='gal'&&(it.pr||0)<(c.r>18?45:c.r>8?20:0)?1000:0)-(v==='lg'&&!it.gal&&!it.ring&&(it.pr||0)<(c.r>3000?7.5:c.r>1500?5:2)?1000:0);});
   list.sort(function(a,b){return b.score-a.score;});
   list.forEach(function(l){var it=l.it,s=toScreen(it.get()),on=it.key===key;
     if(l.score<0||s.z>1||s.z<-1||s.x<0||s.x>W||s.y<0||s.y>H){if(l.vis!==false){l.el.style.display='none';l.vis=false;}return;}
@@ -2062,8 +2062,8 @@ function galPanel(){
   var o2=$('gEnter');if(o2)o2.onclick=function(){enterGalaxy(sel.gal.id);};
 }
 function galSelect(key,fly){state.galSel=key;var it=items.gal.filter(function(x){return x.key===key;})[0];
-  if(it&&fly){cam.gal.gt.copy(it.get());cam.gal.gr=Math.min(cam.gal.gr,it.key==='sun'||it.key.indexOf('sci|')===0?6:it.gal?12:8);if(it.key.indexOf('arm|')===0||it.key==='fermi')cam.gal.gr=Math.max(cam.gal.gr,22);}
-  galPanel();if(fly)$('stage').scrollIntoView({behavior:'smooth',block:'start'});}
+  if(it&&fly){cam.gal.gt.copy(it.get());cam.gal.gr=Math.min(cam.gal.gr,it.key==='sun'||it.key.indexOf('sci|')===0?5:it.gal?14:it.o?3:8);if(it.key.indexOf('arm|')===0||it.key==='fermi')cam.gal.gr=Math.max(cam.gal.gr,22);}
+  galPanel();}
 /* ---- página inicial do Explorar, ilustrada ---- */
 function artCanvas(kind,w,h){
   var c=document.createElement('canvas');c.width=w;c.height=h;var x=c.getContext('2d'),R=mulberry32(kind.length*977+3);
