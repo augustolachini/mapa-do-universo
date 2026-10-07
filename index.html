@@ -707,7 +707,7 @@ function ringTexture(){var c=document.createElement('canvas');c.width=c.height=6
 function hostRingTexture(){var c=document.createElement('canvas');c.width=c.height=64;var g=c.getContext('2d');g.strokeStyle='#ffffff';g.lineWidth=2;g.beginPath();g.arc(32,32,28,0,6.2832);g.stroke();return new THREE.CanvasTexture(c);}
 var glowT=glowTexture(),ringT=ringTexture(),hostT=hostRingTexture();
 function makeMarker(){var s=new THREE.Sprite(new THREE.SpriteMaterial({map:ringT,transparent:true,depthTest:false,depthWrite:false}));s.scale.set(6,6,1);s.visible=false;s.renderOrder=10;return s;}
-function starfield(){var n=700,arr=new Float32Array(n*3);for(var i=0;i<n;i++){var u=Math.random()*2-1,t=Math.random()*6.2832,s=Math.sqrt(1-u*u);arr[i*3]=600*s*Math.cos(t);arr[i*3+1]=600*u;arr[i*3+2]=600*s*Math.sin(t);}var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(arr,3));return new THREE.Points(g,new THREE.PointsMaterial({color:0x8fa0c8,size:1.3,sizeAttenuation:false}));}
+function starfield(){var n=700,arr=new Float32Array(n*3);for(var i=0;i<n;i++){var u=Math.random()*2-1,t=Math.random()*6.2832,s=Math.sqrt(1-u*u);arr[i*3]=600*s*Math.cos(t);arr[i*3+1]=600*u;arr[i*3+2]=600*s*Math.sin(t);}var g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(arr,3));var sf=new THREE.Points(g,new THREE.PointsMaterial({color:0x8fa0c8,size:1.3,sizeAttenuation:false}));sf.name='sf';return sf;}
 function lineOf(pts,color,op){return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),new THREE.LineBasicMaterial({color:color,transparent:true,opacity:op}));}
 
 var cp=function(d){return state.comp?6*Math.sqrt(d):d;};
@@ -822,6 +822,8 @@ function frame(now){
   items[v].forEach(function(it){if(it.key===key)sel=it;});
   if(!sel&&v==='near'&&byId[key]&&byId[key].bg)bgItems.forEach(function(it){if(it.key===key)sel=it;});
   if(sel){mk.visible=true;mk.position.copy(sel.get());var sc=v==='near'?(sel.star.bg?3.5:Math.max(4,starSize(sel.star)+2)):v==='sys'?Math.max(cam.sys.r*0.035,sel.size*3.6):v==='gal'?cam.gal.r*0.07:v==='lg'?cam.lg.r*0.05:5;mk.scale.set(sc,sc,1);}else mk.visible=false;
+  var sf=scenes[v].getObjectByName('sf');if(sf)sf.position.copy(camera.position);  // céu de fundo sempre em volta da câmera
+  var far=Math.max(2000,c.r*6);if(Math.abs(camera.far-far)>far*0.2){camera.far=far;camera.updateProjectionMatrix();}
   renderer.render(scenes[v],camera);
   if(v==='lg'||v==='gal'){placeLabels(v,key);return;}
   labels.forEach(function(l){
@@ -1864,8 +1866,8 @@ var MW_ARMS=[  // nome, θ0 (graus), r0 (kpc), partículas
   ['Perseu',0,4,9000],['Escudo–Centauro',180,4,9000],['Sagitário',90,4.5,5400],['Norma e Externo',270,4.5,5400]];
 function genMW(f){
   var R=mulberry32(20261006),B=new Buf(),k=Math.tan(12*D2R),bar=27*D2R,i,n;
-  for(i=0,n=9000*f;i<n;i++)B.add(G(R)*1.0,G(R)*1.0,G(R)*0.8,255,214,150,0.55);
-  for(i=0,n=7000*f;i<n;i++){var x=Math.max(-4.2,Math.min(4.2,G(R)*1.7)),y=G(R)*0.45;B.add(x*Math.cos(bar)-y*Math.sin(bar),x*Math.sin(bar)+y*Math.cos(bar),G(R)*0.3,255,196,120,0.6);}
+  for(i=0,n=9000*f;i<n;i++)B.add(G(R)*1.0,G(R)*1.0,G(R)*0.8,255,214,150,0.3);
+  for(i=0,n=7000*f;i<n;i++){var x=Math.max(-4.2,Math.min(4.2,G(R)*1.7)),y=G(R)*0.45;B.add(x*Math.cos(bar)-y*Math.sin(bar),x*Math.sin(bar)+y*Math.cos(bar),G(R)*0.3,255,196,120,0.36);}
   for(i=0,n=14000*f;i<n;i++){var r=-3.6*Math.log(1-R()*0.985);if(r>15)continue;var t=R()*6.2832;B.add(r*Math.cos(t),r*Math.sin(t),G(R)*0.2,175,190,235,0.28);}
   MW_ARMS.forEach(function(a){var t0=a[1]*D2R,tmax=t0+Math.log(15/a[2])/k;
     for(var j=0,m=a[3]*f;j<m;j++){var t=t0+R()*(tmax-t0),r=a[2]*Math.exp(k*(t-t0)),s=0.25+0.04*r,b=Math.max(0.15,1-(r-a[2])/12),hii=R()<0.03;
@@ -1876,7 +1878,7 @@ function genMW(f){
 function armPoint(a,r){var k=Math.tan(12*D2R),t=a[1]*D2R+Math.log(r/a[2])/k;return [r*Math.cos(t),r*Math.sin(t)];}
 /* ---- outras galáxias ---- */
 function genSpiral(p,f,seed){var R=mulberry32(seed),B=new Buf(),k=Math.tan(p.k*D2R),i,n;
-  for(i=0,n=6000*f;i<n;i++)B.add(G(R)*p.bojo,G(R)*p.bojo,G(R)*p.bojo*0.7,255,214,150,0.55);
+  for(i=0,n=6000*f;i<n;i++)B.add(G(R)*p.bojo,G(R)*p.bojo,G(R)*p.bojo*0.7,255,214,150,0.32);
   for(i=0,n=12000*f;i<n;i++){var r=-p.escala*Math.log(1-R()*0.985);if(r>p.raio)continue;var t=R()*6.2832;B.add(r*Math.cos(t),r*Math.sin(t),G(R)*p.escala*0.05,175,190,235,0.3);}
   p.bracos.forEach(function(a){var t0=a[0]*D2R,tmax=t0+Math.log(p.raio/a[1])/k;
     for(var j=0,m=7000*f;j<m;j++){var t=t0+R()*(tmax-t0),r=a[1]*Math.exp(k*(t-t0)),s=(0.25+0.04*r)*p.escala/3.6,b=Math.max(0.15,1-(r-a[1])/p.raio),hii=R()<0.03;
@@ -1884,10 +1886,10 @@ function genSpiral(p,f,seed){var R=mulberry32(seed),B=new Buf(),k=Math.tan(p.k*D
   if(p.anel)for(i=0,n=5000*f;i<n;i++){var t2=R()*6.2832,r2=p.anel+G(R)*0.9,hii2=R()<0.06;if(hii2)B.add(r2*Math.cos(t2),r2*Math.sin(t2),0,255,120,170,0.9,true);else B.add(r2*Math.cos(t2),r2*Math.sin(t2),G(R)*0.15,165,185,255,0.6);}
   return B;}
 function genIrregular(p,f,seed){var R=mulberry32(seed),B=new Buf(),i,n;
-  for(i=0,n=8000*f;i<n;i++){var r=-p.escala*Math.log(1-R()*0.98);if(r>p.raio)continue;var t=R()*6.2832;B.add(r*Math.cos(t)*1.1,r*Math.sin(t)*0.85,G(R)*0.25,180,195,240,0.4);}
-  var b=p.barra;for(i=0,n=4000*f;i<n;i++)B.add(G(R)*b[0]+0.4,G(R)*b[1],G(R)*b[2],255,205,140,0.6);
+  for(i=0,n=8000*f;i<n;i++){var r=-p.escala*Math.log(1-R()*0.98);if(r>p.raio)continue;var t=R()*6.2832;B.add(r*Math.cos(t)*1.1,r*Math.sin(t)*0.85,G(R)*0.25,180,195,240,0.3);}
+  var b=p.barra;for(i=0,n=4000*f;i<n;i++)B.add(G(R)*b[0]+0.4,G(R)*b[1],G(R)*b[2],255,205,140,0.32);
   for(var c=0;c<9;c++){var cx=G(R)*p.raio*0.35,cy=G(R)*p.raio*0.35,cs=0.2+R()*0.4,hii=c<4;
-    for(i=0,n=400*f;i<n;i++)B.add(cx+G(R)*cs,cy+G(R)*cs,G(R)*0.1,hii?255:170,hii?120:200,hii?170:255,hii?0.9:0.6,hii&&R()<0.25);}
+    for(i=0,n=400*f;i<n;i++)B.add(cx+G(R)*cs,cy+G(R)*cs,G(R)*0.1,hii?255:170,hii?120:200,hii?170:255,hii?0.6:0.38,hii&&R()<0.25);}
   p.bracos.forEach(function(a){for(i=0,n=2500*f;i<n;i++){var t=(a[0]+R()*120)*D2R,r=a[1]+R()*p.raio*0.5;B.add(r*Math.cos(t)+G(R)*0.3,r*Math.sin(t)+G(R)*0.3,G(R)*0.15,160,185,255,0.5);}});
   return B;}
 function genElliptical(p,f,seed){var R=mulberry32(seed),B=new Buf();for(var i=0,n=3000*f;i<n;i++)B.add(G(R)*p.s[0],G(R)*p.s[1],G(R)*p.s[2],255,215,165,0.5);return B;}
@@ -1904,16 +1906,37 @@ function pointsOf(B,g,s,size){var pl=placer(g,s),grp=new THREE.Group();
 function iconSprite(v,col,px){var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,color:col,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,sizeAttenuation:false}));sp.scale.set(px,px,1);sp.position.copy(v);return sp;}
 function ringAt(v,col,px){var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:hostT,color:col,depthWrite:false,depthTest:false,transparent:true,sizeAttenuation:false}));sp.scale.set(px,px,1);sp.position.copy(v);return sp;}
 
+/* ---- imagem da galáxia, desenhada uma vez a partir das partículas, aplicada num plano com a orientação real ---- */
+var TEXC={};
+function galTexture(g){
+  if(TEXC[g.id])return TEXC[g.id];
+  var B=genOf(g,0.6),R=g.gen==='mw'?16:g.raio*1.15,N=512,cv=document.createElement('canvas');cv.width=cv.height=N;var x=cv.getContext('2d');
+  x.fillStyle='#000';x.fillRect(0,0,N,N);x.globalCompositeOperation='lighter';
+  function draw(p,c,sz,a){for(var i=0;i<p.length;i+=3){var px=N/2+p[i]/R*N/2,py=N/2-p[i+1]/R*N/2;
+    x.fillStyle='rgba('+(c[i]*255|0)+','+(c[i+1]*255|0)+','+(c[i+2]*255|0)+','+a+')';x.fillRect(px,py,sz,sz);}}
+  draw(B.p,B.c,1.8,0.6);draw(B.hp,B.hc,3.2,0.9);
+  try{x.filter='blur(4px)';x.globalAlpha=0.9;x.drawImage(cv,0,0);x.filter='none';x.globalAlpha=1;}catch(e){}
+  // fundo preto vira transparente
+  var im=x.getImageData(0,0,N,N),d=im.data;for(var j=0;j<d.length;j+=4){var m=Math.max(d[j],d[j+1],d[j+2]);d[j+3]=Math.min(255,m*2.2);}
+  x.putImageData(im,0,0);var t=new THREE.CanvasTexture(cv);TEXC[g.id]={t:t,R:R};return TEXC[g.id];
+}
+function galImpostor(g,amp){
+  var T=galTexture(g),size=2*T.R*amp,c=gv(g.c[0],g.c[1],g.c[2]);
+  if(g.gen==='eliptica'){var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:T.t,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));sp.scale.set(size,size,1);sp.position.copy(c);return sp;}
+  var X=gv(g.u[0],g.u[1],g.u[2]).sub(gv(0,0,0)).normalize(),Z=gv(g.n[0],g.n[1],g.n[2]).sub(gv(0,0,0)).normalize(),Y=new THREE.Vector3().crossVectors(Z,X).normalize();
+  var m=new THREE.Mesh(new THREE.PlaneGeometry(size,size),new THREE.MeshBasicMaterial({map:T.t,transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));
+  m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(X,Y,Z));m.position.copy(c);return m;
+}
 /* ---- nível 1: Grupo Local ---- */
 function buildLG(){
   var sc=new THREE.Scene();sc.add(starfield());items.lg=[];
-  GL.gal.forEach(function(g){var amp=g.id==='mw'?2:2.5,f=g.id==='mw'||g.id==='m31'?0.3:0.35;sc.add(pointsOf(genOf(g,f),g,amp,1.3));
+  GL.gal.forEach(function(g){var amp=g.id==='lmc'||g.id==='smc'||g.gen==='eliptica'?4:5;sc.add(galImpostor(g,amp));
     var v=gv(g.c[0],g.c[1],g.c[2]);items.lg.push({key:'g|'+g.id,gal:g,get:function(){return v;},label:g.nome,pr:g.id==='mw'||g.id==='m31'?10:g.id==='m33'||g.id==='lmc'?8:6,star:{dest:1}});});
   var a=gv(0,0,0),b=gv(GALS.m31.c[0],GALS.m31.c[1],GALS.m31.c[2]);sc.add(lineOf([a,b],0x5a5a66,0.6));
   var mid=a.clone().lerp(b,0.5);items.lg.push({key:'lbl|dist',get:function(){return mid;},label:'2,5 milhões de anos-luz',pr:4,ring:1,star:{dest:1}});
-  var sun=placer(GALS.mw,2)(SUN_R*Math.cos(SUN_T*D2R),SUN_R*Math.sin(SUN_T*D2R),0);sc.add(ringAt(sun,0xffe27a,0.03));
+  var sun=placer(GALS.mw,5)(SUN_R*Math.cos(SUN_T*D2R),SUN_R*Math.sin(SUN_T*D2R),0);sc.add(ringAt(sun,0xffe27a,0.025));
   markers.lg=makeMarker();sc.add(markers.lg);scenes.lg=sc;
-  cam.lg.gt.copy(a.clone().lerp(b,0.42));cam.lg.tg.copy(cam.lg.gt);cam.lg.r=cam.lg.gr=1250/Math.min(1,Math.pow(W/H,0.8));
+  cam.lg.gt.copy(a.clone().lerp(b,0.42));cam.lg.tg.copy(cam.lg.gt);cam.lg.r=cam.lg.gr=950/Math.min(1,Math.pow(W/H,0.8));
 }
 function enterGalaxy(id){
   var g=GALS[id],v=gv(g.c[0],g.c[1],g.c[2]);state.galSel=null;state.galCat=null;
@@ -1956,20 +1979,20 @@ function buildGal(){
     GL.ciencia.forEach(function(o){var v=gv(o.p[0],o.p[1],o.p[2]),c=CIENCIA_COR[o.tipo]||0xffb36b;sc.add(iconSprite(v,c,0.03));
       add('sci|'+o.id,v,o.nome,o.id==='sgra'?95:o.id==='sgrdsph'?50:/bh3|bh1|cygx1|crabp|j0737|b1919|betel|etacar/.test(o.id)?45:35,o.id==='sgra'?'bn':sciCat(o.tipo),{sci:o,txt:o.txt,tipo:o.tipo,dist:o.d,fonte:o.fonte});});
     var sg=GL.ciencia.filter(function(o){return o.id==='sgrdsph';})[0];
-    if(sg){var Rs=mulberry32(5),sp=[],scol=[];for(var j=0;j<1500;j++){var w=gv(sg.p[0]+G(Rs)*0.7,sg.p[1]+G(Rs)*0.7,sg.p[2]+G(Rs)*2.4);sp.push(w.x,w.y,w.z);scol.push(0.6,0.55,0.45);}
+    if(sg){var Rs=mulberry32(5),sp=[],scol=[];for(var j=0;j<1500;j++){var w=gv(sg.p[0]+G(Rs)*0.7,sg.p[1]+G(Rs)*0.7,sg.p[2]+G(Rs)*2.4);sp.push(w.x,w.y,w.z);scol.push(0.22,0.2,0.16);}
       var sgeo=new THREE.BufferGeometry();sgeo.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));sgeo.setAttribute('color',new THREE.Float32BufferAttribute(scol,3));
       sc.add(new THREE.Points(sgeo,new THREE.PointsMaterial({size:1.2,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:0.8,depthWrite:false,blending:THREE.AdditiveBlending})));}
     var og=new THREE.Group();og.name='objetos';
-    EXO.forEach(function(o){if(o.ex==null||o.cat==='galaxia')return;if(Math.hypot(o.ex,o.ey,o.gz)>40)return;var v=gv(o.ex,o.ey,o.gz);og.add(iconSprite(v,CAT_COR[o.cat],0.018));
+    EXO.forEach(function(o){if(o.ex==null||o.cat==='galaxia')return;if(Math.hypot(o.ex,o.ey,o.gz)>40)return;var v=gv(o.ex,o.ey,o.gz);var ic=new THREE.Sprite(new THREE.SpriteMaterial({map:glowT,color:CAT_COR[o.cat],blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0.9}));ic.scale.set(0.09,0.09,1);ic.position.copy(v);og.add(ic);
       add(o.id,v,o.nome!==o.id?o.nome:o.id,o.id.charAt(0)==='M'&&o.nome!==o.id?25:o.id.charAt(0)==='M'?12:6,o.cat,{o:o,tipo:o.tipo,dist:o.d});});
     og.visible=state.galLayers.objetos;sc.add(og);
-    ['lmc','smc'].forEach(function(id){var h=GALS[id];sc.add(pointsOf(genOf(h,0.35),h,1,1.2));var v=gv(h.c[0],h.c[1],h.c[2]);add('g|'+id,v,h.nome,40,'gal',{gal:h,tipo:h.tipo,dist:h.d});});
+    ['lmc','smc'].forEach(function(id){var h=GALS[id];sc.add(galImpostor(h,1));var v=gv(h.c[0],h.c[1],h.c[2]);add('g|'+id,v,h.nome,40,'gal',{gal:h,tipo:h.tipo,dist:h.d});});
     var gc=gv(0,0,0);sc.add(iconSprite(gc,0xfff0c8,0.05));
   }else{
     (g.objs||[]).forEach(function(o){var v=gv(o.p[0],o.p[1],o.p[2]),c=/Buraco/.test(o.tipo)?0xc79bff:/Supernova/.test(o.tipo)?0xffb36b:0xff7fa8;sc.add(iconSprite(v,c,0.03));
       add('ext|'+o.id,v,o.nome,40,/Buraco/.test(o.tipo)?'bn':'reg',{txt:o.txt,tipo:o.tipo});});
     if(g.id==='m31')['m32','m110'].forEach(function(id){var h=GALS[id];sc.add(pointsOf(genOf(h,1),h,1,1.2));var v=gv(h.c[0],h.c[1],h.c[2]);add('g|'+id,v,h.nome,50,'gal',{gal:h,tipo:h.tipo,dist:h.d});});
-    if(g.id==='lmc'||g.id==='smc'){var o2=GALS[g.id==='lmc'?'smc':'lmc'];sc.add(pointsOf(genOf(o2,0.5),o2,1,1.2));var v2=gv(o2.c[0],o2.c[1],o2.c[2]);add('g|'+o2.id,v2,o2.nome,50,'gal',{gal:o2,tipo:o2.tipo,dist:o2.d});}
+    if(g.id==='lmc'||g.id==='smc'){var o2=GALS[g.id==='lmc'?'smc':'lmc'];sc.add(galImpostor(o2,1));var v2=gv(o2.c[0],o2.c[1],o2.c[2]);add('g|'+o2.id,v2,o2.nome,50,'gal',{gal:o2,tipo:o2.tipo,dist:o2.d});}
     var cv=gv(g.c[0],g.c[1],g.c[2]);add('centro',cv,'Centro de '+g.nome.replace(/ \(.*\)/,''),70,'marco',{ring:1});
   }
   markers.gal=makeMarker();sc.add(markers.gal);scenes.gal=sc;
@@ -2037,7 +2060,7 @@ function showHub(){
 function lgPanel(){
   var p=$('explore');
   p.innerHTML='<div class="crumbs"><b>Explorar</b><span>›</span><b>Grupo Local</b></div>'
-    +'<p class="vsub">Toque numa galáxia para entrar nela. Tamanhos das galáxias ampliados 2× para aparecerem a esta distância; posições reais.</p>'
+    +'<p class="vsub">Toque numa galáxia para entrar nela. Tamanhos das galáxias ampliados 4 a 5× para aparecerem a esta distância; posições e inclinações reais.</p>'
     +'<div class="gchips">'+GL.gal.map(function(g){return '<button data-ge="'+g.id+'">'+esc(g.nome)+'</button>';}).join('')+'</div><div id="exhub"></div>';
   p.querySelectorAll('[data-ge]').forEach(function(b){b.onclick=function(){enterGalaxy(b.getAttribute('data-ge'));};});
   showHub();
