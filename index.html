@@ -861,7 +861,7 @@ var ray=new THREE.Raycaster(),plane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
 function groundPoint(x,y){ray.setFromCamera(new THREE.Vector2(x/W*2-1,-y/H*2+1),camera);return ray.ray.intersectPlane(plane,new THREE.Vector3());}
 // f<1 aproxima. Com (px,py), o zoom vai na direção do astro sob o cursor ou do ponto no plano das órbitas.
 function zoom(f,px,py){
-  var v=state.view,c=cam[v],lim=v==='near'?[8,220]:v==='deep'?[6,260]:v==='cons3d'?[1,300]:v==='gal'?[0.25,220]:v==='lg'?[40,30000]:[state.sysReal?0.0005:0.5,150];
+  var v=state.view,c=cam[v],lim=v==='near'?[8,220]:v==='deep'?[6,260]:v==='cons3d'?[1,300]:v==='gal'?[0.25,220]:v==='lg'?[4,30000]:[state.sysReal?0.0005:0.5,150];
   var nr=Math.max(lim[0],Math.min(lim[1],c.gr*f)),ef=nr/c.gr;
   if(!(v==='sys'&&state.follow)){
     if(ef<1&&px!=null){var it=pick(px,py),p=it?it.get().clone():groundPoint(px,py);if(p)c.gt.add(p.sub(c.gt).multiplyScalar(1-ef));}
@@ -883,7 +883,7 @@ $('zOut').onclick=function(){if(state.view==='sky'){skyZoom(1/0.7);return;}state
 
 function tap(it){
   if(state.view==='deep'){if(it&&!it.ring)exSelect(it.key,false);return;}
-  if(state.view==='lg'){if(it&&it.gal)enterGalaxy(it.gal.id);else if(it&&it.viz){state.lgSel=it.key;lgPanel();}return;}
+  if(state.view==='lg'){if(it&&it.gal)enterGalaxy(it.gal.id);else if(it&&it.viz)lgFocus(it);return;}
   if(state.view==='gal'){if(it&&!it.ring)galSelect(it.key,false);return;}
   if(state.view==='cons3d')return;
   if(state.view==='near'){
@@ -1915,6 +1915,8 @@ function galTexture(g){
   x.fillStyle='#000';x.fillRect(0,0,N,N);x.globalCompositeOperation='lighter';
   function draw(p,c,sz,a){for(var i=0;i<p.length;i+=3){var px=N/2+p[i]/R*N/2,py=N/2-p[i+1]/R*N/2;
     x.fillStyle='rgba('+(c[i]*255|0)+','+(c[i+1]*255|0)+','+(c[i+2]*255|0)+','+a+')';x.fillRect(px,py,sz,sz);}}
+  if(g.gen==='eliptica'){var gr=x.createRadialGradient(N/2,N/2,0,N/2,N/2,N*0.42);gr.addColorStop(0,'rgba(255,225,180,.95)');gr.addColorStop(0.25,'rgba(255,205,150,.45)');gr.addColorStop(1,'rgba(0,0,0,0)');
+    x.save();x.translate(N/2,N/2);x.scale(1,0.8);x.translate(-N/2,-N/2);x.fillStyle=gr;x.fillRect(0,0,N,N);x.restore();}  // elípticas: brilho difuso, mais forte no centro
   draw(B.p,B.c,1.8,0.6);draw(B.hp,B.hc,3.2,0.9);
   try{x.filter='blur(4px)';x.globalAlpha=0.9;x.drawImage(cv,0,0);x.filter='none';x.globalAlpha=1;}catch(e){}
   // fundo preto vira transparente
@@ -1948,8 +1950,18 @@ function buildLG(){
     var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex[k].t,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:false,rotation:(g[0].length*1.7)%6.28}));var ss=0.02+0.035*Math.log10(1+d);sp.scale.set(ss,ss,1);sp.position.copy(v);sc.add(sp);  // tamanho fixo na tela, maior para galáxias maiores
     var absM=g[6]!=null?g[6]-5*Math.log10(g[7]*1e5):-12,nm=vizNome(g[0]),fam=NOMES_VIZ[g[0]]||/^MESSIER/.test(g[0]);
     items.lg.push({key:'v|'+g[0],viz:g,get:function(){return v;},label:nm,pr:Math.max(0,-absM-12)+(fam?6:0),star:{dest:1}});});
+  scenes.lgTex=tex;
   markers.lg=makeMarker();sc.add(markers.lg);scenes.lg=sc;
   cam.lg.gt.copy(a.clone().lerp(b,0.42));cam.lg.tg.copy(cam.lg.gt);cam.lg.r=cam.lg.gr=950/Math.min(1,Math.pow(W/H,0.8));
+}
+// tocar numa galáxia vizinha: a câmera vai até ela e aparece uma versão no tamanho real (ampliável com zoom)
+function lgFocus(it){
+  var g=it.viz,sc=scenes.lg,old=sc.getObjectByName('foco');if(old)sc.remove(old);
+  var t=g[5]==null?10:g[5],k=t<0?'e':t>=9?'i':'s',d=Math.max(1.5,g[4]||2),v=it.get();
+  var sp=new THREE.Sprite(new THREE.SpriteMaterial({map:scenes.lgTex[k].t,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,rotation:(g[0].length*1.7)%6.28}));
+  sp.scale.set(d*1.25,d*1.25,1);sp.position.copy(v);sp.name='foco';sc.add(sp);
+  state.lgSel=it.key;cam.lg.gt.copy(v);cam.lg.gr=Math.max(d*3,8);lgPanel();
+  $('stage').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function enterGalaxy(id){
   var g=GALS[id],v=gv(g.c[0],g.c[1],g.c[2]);state.galSel=null;state.galCat=null;
