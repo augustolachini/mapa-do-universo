@@ -305,7 +305,7 @@ label.btn{background:transparent;border-color:rgba(255,255,255,.42);color:#fff;f
 .exph canvas{position:absolute;left:0;top:0;pointer-events:none}
 .exinfo h2{font-family:var(--serif);font-weight:800;font-size:26px;margin:0 0 2px}
 .exinfo p{font-size:14px}
-@media (max-width:699px){.tabs{grid-template-columns:repeat(5,1fr)}.tabs button{font-size:9.5px;letter-spacing:.02em}}
+@media (max-width:699px){.tabs{grid-template-columns:repeat(6,1fr)}.tabs button{font-size:8.5px;letter-spacing:0}}
 .lgk{display:inline-block;width:10px;height:10px;border-radius:50%;margin:0 5px 0 8px;vertical-align:0}
 .excard img.fail{background:#141418 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='1.5'%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3C/svg%3E") center/30% no-repeat}
 .exth{position:relative}.exth canvas{position:absolute;left:0;top:0;pointer-events:none}
@@ -364,6 +364,10 @@ label.btn{background:transparent;border-color:rgba(255,255,255,.42);color:#fff;f
 .horo-g{font-size:16px;line-height:1.5;margin:12px 0}.horo-t{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .horo-t div{background:#17171b;border-radius:8px;padding:9px 12px;font-size:14px}.horo-t small{display:block;color:var(--acc);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
 #hSel{margin-top:10px}
+.mapa3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.mapa3 div{background:#17171b;border-radius:8px;padding:10px;text-align:center}
+.mapa3 small{display:block;color:#8d8d93;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;min-height:2.6em}.mapa3 .horo-s{margin:6px auto;width:46px;height:46px;font-size:28px}
+.mapa3 b{display:block;font-family:var(--serif);font-size:17px;font-weight:800}.mapa3 em{display:block;font-style:normal;color:#b9b9bb;font-size:12px;margin-top:2px}
+.retro-now div{background:#17171b;border-left:3px solid var(--acc);border-radius:6px;padding:9px 12px;margin-bottom:6px}.retro-now b{display:block}.retro-now span{color:#8d8d93;font-size:13px}
 </style>
 </head>
 <body>
@@ -373,7 +377,8 @@ label.btn{background:transparent;border-color:rgba(255,255,255,.42);color:#fff;f
   <div class="stats" id="stats"></div>
 
   <nav class="tabs" aria-label="Seções">
-    <button id="tHoje"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='12' r='4'/><path d='M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8'/></svg><span class="tl">Hoje</span></button>
+    <button id="tHoje"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='12' r='4'/><path d='M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8'/></svg><span class="tl">Astronomia</span></button>
+    <button id="tAst"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z'/><path d='M17 3v3M15.5 4.5h3'/></svg><span class="tl">Astrologia</span></button>
     <button id="tSkyB"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><path d='M12 3l1.8 4.6L18.5 9l-4.7 1.6L12 15l-1.8-4.4L5.5 9l4.7-1.4z'/><path d='M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z'/><path d='M5 17l.5 1.2 1.2.5-1.2.5L5 20.4l-.5-1.2-1.2-.5 1.2-.5z'/></svg><span class="tl">Céu</span></button>
     <button id="tNear" class="on"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='12' r='2.2'/><circle cx='5' cy='7' r='1.4'/><circle cx='19' cy='6' r='1.4'/><circle cx='17.5' cy='18' r='1.4'/><circle cx='6' cy='17.5' r='1.4'/><path d='M6.2 7.8l4 3M17.8 6.9l-4 3.6M16.4 17l-2.8-3.3M7.2 16.6l3-3.2' opacity='.6'/></svg><span class="tl">Vizinhança</span></button>
     <button id="tSys"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true'><circle cx='12' cy='12' r='4.5'/><ellipse cx='12' cy='12' rx='10' ry='3.6' transform='rotate(-22 12 12)'/></svg><span class="tl">Sistema</span><span class="ts"></span></button>
@@ -938,14 +943,14 @@ function fitSystem(){state.follow=null;state.planet=null;cam.sys.gt.set(0,0,0);c
 /* ---------- interface ---------- */
 function setView(v){
   state.view=v;lsSet('mapa.view',v);
-  var isHoje=v==='hoje',isExp=v==='deep'||v==='cons3d'||v==='lg'||v==='gal';$('hoje').hidden=!isHoje;$('stage').hidden=$('legend').hidden=isHoje;$('card').hidden=isHoje||isExp;$('explore').hidden=!isExp;
+  var isHoje=v==='hoje'||v==='astro',isExp=v==='deep'||v==='cons3d'||v==='lg'||v==='gal';$('hoje').hidden=!isHoje;$('stage').hidden=$('legend').hidden=isHoje;$('card').hidden=isHoje||isExp;$('explore').hidden=!isExp;
   $('tExp').classList.toggle('on',isExp);
   if(v==='deep'&&!scenes.deep)buildDeep();
   if(v==='lg'&&!scenes.lg)buildLG();
   if(v==='gal'&&state.builtGal!==state.galId){buildGal();state.builtGal=state.galId;}
   if(v==='cons3d'&&state.exSel&&EXC[state.exSel]&&state.consId!==state.exSel){buildCons3d(state.exSel);state.consId=state.exSel;}
-  if(isHoje){$('skyPanel').hidden=true;$('chips').hidden=true;$('find').hidden=true;['tHoje','tSkyB','tNear','tSys','tExp'].forEach(function(id){$(id).classList.toggle('on',id==='tHoje');});
-    ['bScale','bPause','bFit'].forEach(function(id){$(id).hidden=true;});$('tSys').querySelector('.ts').textContent=': '+byId[state.star].name;clearInterval(sky.timer);stopAR();renderHoje();return;}
+  if(isHoje){$('skyPanel').hidden=true;$('chips').hidden=true;$('find').hidden=true;['tHoje','tAst','tSkyB','tNear','tSys','tExp'].forEach(function(id){$(id).classList.toggle('on',id===(v==='astro'?'tAst':'tHoje'));});
+    ['bScale','bPause','bFit'].forEach(function(id){$(id).hidden=true;});$('tSys').querySelector('.ts').textContent=': '+byId[state.star].name;clearInterval(sky.timer);stopAR();if(v==='astro')renderAstro();else renderHoje();return;}
   if(v==='sys'){state.planet=null;buildSys();}
   var isSky=v==='sky';
   $('cv').hidden=$('labels').hidden=isSky;['sky','skyPanel','skyTools','skyDirs'].forEach(function(id){$(id).hidden=!isSky;});
@@ -956,6 +961,7 @@ function setView(v){
 }
 $('tSkyB').onclick=function(){setView('sky');};
 $('tHoje').onclick=function(){setView('hoje');};
+$('tAst').onclick=function(){setView('astro');};
 $('tExp').onclick=function(){setView('lg');};
 $('tNear').onclick=function(){setView('near');};
 $('tSys').onclick=function(){setView('sys');};
@@ -1039,7 +1045,7 @@ function photoBlock(){
   return '<div class="row" style="margin-top:12px"><label class="btn"><input type="file" accept="image/*" id="file" data-k="'+esc(k)+'">'+(has?'Trocar minha foto':'Adicionar minha foto')+'</label></div><div id="ph"></div>';
 }
 function refresh(){
-  var v=state.view;if(v==='hoje')return;
+  var v=state.view;if(v==='hoje'||v==='astro')return;$('tAst').classList.remove('on');
   if(v==='lg'||v==='gal'){
     ['tHoje','tSkyB','tNear','tSys'].forEach(function(id){$(id).classList.remove('on');});$('tExp').classList.add('on');
     ['bScale','bPause','bFit','find','chips','skyPanel'].forEach(function(id){$(id).hidden=true;});
@@ -2553,7 +2559,7 @@ function astroCard(el){
   var oph=rota.filter(function(r){return r.sym==='Oph';})[0];
   var nasc=lsGet('mapa.nasc'),nb=nasc?new Date(nasc+'T12:00'):null;
   var corpos=[['Moon','Lua'],['Mercury','Mercúrio'],['Venus','Vênus'],['Mars','Marte'],['Jupiter','Júpiter'],['Saturn','Saturno']];
-  el.innerHTML='<div id="horoBox"></div><h4 class="evm" style="text-transform:none;margin-top:16px">E no céu de verdade?</h4><div class="astro"><div class="astro-vs"><div><small>Signo do calendário astrológico</small><b>'+sig+'</b></div><span>×</span><div><small>Onde o Sol está de verdade</small><b>'+sol.nome+'</b></div></div>'
+  el.innerHTML='<div class="astro"><div class="astro-vs"><div><small>Signo do calendário astrológico</small><b>'+sig+'</b></div><span>×</span><div><small>Onde o Sol está de verdade</small><b>'+sol.nome+'</b></div></div>'
     +'<p>'+(sig===sol.nome?'Hoje os dois coincidem, o que é raro: por causa da <b>precessão</b>, o calendário astrológico está quase um signo inteiro atrasado em relação ao céu.':'Por causa da <b>precessão</b> (o eixo da Terra gira devagar, como um pião), o céu andou quase um signo inteiro desde que o zodíaco foi criado, há ~2 mil anos. Por isso o Sol de hoje está em '+sol.nome+', não em '+sig+'.')+'</p>'
     +(nb?'<div class="astro-vs small"><div><small>Seu signo (nascimento '+nb.toLocaleDateString('pt-BR')+')</small><b>'+signoDe(nb)+'</b></div><span>×</span><div><small>Constelação real do Sol nesse dia</small><b>'+consDe('Sun',nb).nome+'</b></div></div>'
       :'<p class="vsub">Salve sua data de nascimento em "A luz que você vê" para ver o seu "signo de verdade".</p>')
@@ -2561,7 +2567,6 @@ function astroCard(el){
     +'<p class="vsub">Os 12 signos têm 30° cada; as constelações não: o Sol fica '+(dias.Vir||'?')+' dias em Virgem e só '+(dias.Sco||'?')+' em Escorpião.</p>'
     +'<h4 class="evm" style="text-transform:none">Onde estão hoje, de verdade</h4><div class="gchips">'+corpos.map(function(c){return '<span class="achip"><b>'+c[1]+'</b> em '+consDe(c[0],d).nome+'</span>';}).join('')+'</div>'
     +'<p class="vsub" style="margin-top:10px">Horóscopo é entretenimento: a astrologia não tem comprovação científica. As posições dos astros, essas sim, são calculadas com efemérides astronômicas.</p></div>';
-  horoCard($('horoBox'));
 }
 
 /* ---- horóscopo do dia (entretenimento): gerado a partir da Lua real de hoje e da relação dela com o signo escolhido ---- */
@@ -2599,14 +2604,70 @@ function horoCard(box){
     $('hTroca').onclick=function(){var s2=$('hSel');s2.hidden=!s2.hidden;};}
   box.querySelectorAll('[data-sg]').forEach(function(b){b.onclick=function(){lsSet('mapa.signo',+b.getAttribute('data-sg'));horoCard(box);};});
 }
+
+/* ====================== aba Astrologia ====================== */
+var PALAVRAS=['impulso e coragem','constância e prazer','curiosidade e conversa','cuidado e memória','brilho e generosidade','método e atenção aos detalhes','equilíbrio e diplomacia','intensidade e profundidade','aventura e otimismo','ambição e disciplina','originalidade e liberdade','sensibilidade e imaginação'];
+function sigOf(lon){return Math.floor(((lon%360)+360)%360/30);}
+function grauSig(lon){var l=((lon%360)+360)%360;return fmt(l%30,0)+'° de '+SIGNOS[Math.floor(l/30)];}
+function eclLon(body,d){if(body==='Sun')return Astronomy.SunPosition(d).elon;if(body==='Moon')return Astronomy.EclipticGeoMoon(d).lon;return Astronomy.Ecliptic(Astronomy.GeoVector(body,d,true)).elon;}
+function ascendente(d,lat,lon){  // grau do zodíaco nascendo no horizonte leste
+  var ramc=(Astronomy.SiderealTime(d)*15+lon)*D2R,eps=23.4393*D2R,phi=lat*D2R;
+  return ((Math.atan2(Math.cos(ramc),-(Math.sin(ramc)*Math.cos(eps)+Math.tan(phi)*Math.sin(eps)))/D2R)%360+360)%360;
+}
+function mapaCard(el){
+  var m=lsGet('mapa.astral')||{};
+  el.innerHTML='<p class="vsub">Data, hora e local de nascimento. Fica salvo só neste celular.</p><div class="dgrid">'
+    +'<label>Nascimento<input id="maQ" type="datetime-local" class="find" value="'+(m.q||'')+'"></label>'
+    +'<label>Cidade<input id="maC" class="find" placeholder="Ex.: São Paulo" value="'+esc(m.cidade||'')+'"></label></div>'
+    +'<div class="row" style="margin:8px 0"><button class="pri" id="maGo">Calcular meu mapa</button><span class="vsub" id="maMsg" style="margin:0"></span></div><div id="maRes"></div>';
+  function show(m){
+    var d=new Date(m.q),sol=eclLon('Sun',d),lua=eclLon('Moon',d),asc=ascendente(d,m.lat,m.lon);
+    var tri=[['Sol','Sua essência',sol],['Lua','Suas emoções',lua],['Ascendente','Como os outros te veem',asc]];
+    var pl=[['Mercury','Mercúrio'],['Venus','Vênus'],['Mars','Marte'],['Jupiter','Júpiter'],['Saturn','Saturno']];
+    $('maRes').innerHTML='<div class="mapa3">'+tri.map(function(t){var sg=sigOf(t[2]);return '<div><small>'+t[0]+' · '+t[1]+'</small><span class="horo-s">'+SIMB[sg]+'</span><b>'+SIGNOS[sg]+'</b><em>'+PALAVRAS[sg]+'</em></div>';}).join('')+'</div>'
+      +'<div class="gchips" style="margin-top:10px">'+pl.map(function(p){var g=eclLon(p[0],d);return '<span class="achip"><b>'+p[1]+'</b> em '+grauSig(g)+'</span>';}).join('')+'</div>'
+      +'<p class="vsub">'+esc(m.cidade||'')+' ('+fmt(m.lat,2)+'°, '+fmt(m.lon,2)+'°). A hora é lida no fuso deste celular; se você nasceu em outro fuso, ajuste a hora. Posições: efemérides astronômicas; leitura: tradição astrológica.</p>';
+  }
+  if(m.q&&m.lat!=null)show(m);
+  $('maGo').onclick=function(){var q=$('maQ').value,c=$('maC').value.trim(),msg=$('maMsg');if(!q){msg.textContent='Preencha a data e a hora.';return;}
+    function done(lat,lon,nome){var o={q:q,cidade:nome,lat:lat,lon:lon};lsSet('mapa.astral',o);msg.textContent='';show(o);}
+    if(!c){if(state.loc)done(state.loc.lat,state.loc.lon,'local atual');else msg.textContent='Informe a cidade.';return;}
+    msg.textContent='Buscando a cidade…';
+    fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=pt&name='+encodeURIComponent(c)).then(function(r){return r.json();})
+      .then(function(j){var g=j.results&&j.results[0];if(!g){msg.textContent='Cidade não encontrada.';return;}
+        try{done(g.latitude,g.longitude,g.name+(g.admin1?', '+g.admin1:''));}catch(e){msg.textContent='Não consegui calcular o mapa: '+e.message;}},
+        function(){msg.textContent='Sem internet para achar a cidade; tente de novo.';});};
+}
+var RETRO=null;
+function retrogrados(){  // varredura diária da longitude: retrógrado quando ela diminui
+  if(RETRO)return RETRO;var t0=new Date(Date.now()-120*864e5),out=[];
+  [['Mercury','Mercúrio'],['Venus','Vênus'],['Mars','Marte'],['Jupiter','Júpiter'],['Saturn','Saturno']].forEach(function(p){
+    var prev=null,cur=null;for(var i=0;i<=600;i++){var d=new Date(t0.getTime()+i*864e5),l=eclLon(p[0],d);
+      if(prev!=null){var dl=((l-prev+540)%360)-180;if(dl<0&&!cur)cur={b:p[1],ini:d,lon:l};if(dl>=0&&cur){cur.fim=d;out.push(cur);cur=null;}}prev=l;}
+    if(cur){cur.fim=null;out.push(cur);}});
+  out.sort(function(a,b){return a.ini-b.ini;});RETRO=out;return out;}
+function retroCard(el){
+  var now=new Date(),L=retrogrados(),dm=function(x){return x?x.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}):'…';};
+  var ativos=L.filter(function(r){return r.ini<=now&&(!r.fim||r.fim>=now);}),prox=L.filter(function(r){return r.ini>now;}).slice(0,6);
+  el.innerHTML='<div class="retro-now">'+(ativos.length?ativos.map(function(r){return '<div><b>'+r.b+' retrógrado</b><span>até '+dm(r.fim)+'</span></div>';}).join(''):'<div><b>Nenhum planeta pessoal retrógrado agora</b><span>Mercúrio, Vênus e Marte seguem direto.</span></div>')+'</div>'
+    +'<h4 class="evm" style="text-transform:none">Próximos</h4>'+prox.map(function(r,i){return '<div class="ev"><div class="evd"><b>'+r.ini.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})+'</b><span>'+r.ini.getFullYear()+'</span></div><div class="evb"><b>'+r.b+' retrógrado</b><span>de '+dm(r.ini)+' a '+dm(r.fim)+' ('+Math.round(((r.fim||now)-r.ini)/864e5)+' dias), em '+SIGNOS[sigOf(r.lon)]+'</span><div class="row"><button data-ri="'+i+'">Lembrete</button></div></div></div>';}).join('')
+    +'<p class="ftxt" style="font-size:14px;margin-top:10px"><b>E na astronomia?</b> O planeta nunca anda para trás. Quando a Terra, que é mais rápida, ultrapassa um planeta de fora (ou é ultrapassada por Mercúrio e Vênus), ele parece recuar no céu por algumas semanas, como um carro mais lento visto de outro que passa por ele na estrada.</p>';
+  el.querySelectorAll('[data-ri]').forEach(function(b){b.onclick=function(){var r=prox[+b.getAttribute('data-ri')];icsFor({t:r.ini,titulo:r.b+' retrógrado',texto:'Até '+dm(r.fim)+'.'});};});
+}
+function renderAstro(){
+  var h=$('hoje'),secs=[['aHoro','Horóscopo do dia'],['aMapa','Seu mapa astral'],['aRetro','Planetas retrógrados'],['aReal','E no céu de verdade?']];
+  h.innerHTML='<p class="vsub">'+dayStr(new Date())+' · entretenimento: a astrologia não tem comprovação científica; as posições dos astros são calculadas com efemérides.</p><div class="hgrid">'
+    +secs.map(function(s){return '<section class="hcard'+(s[0]==='aReal'?' wide':'')+'"><h3>'+s[1]+'</h3><div id="'+s[0]+'"></div></section>';}).join('')+'</div>';
+  horoCard($('aHoro'));mapaCard($('aMapa'));retroCard($('aRetro'));astroCard($('aReal'));
+}
 /* ---- montagem da aba ---- */
 function renderHoje(){
   var h=$('hoje');
   if(!state.loc){h.innerHTML='<div class="hcard"><h3>Bem-vindo</h3><div id="hLoc"></div></div>';var tmp=$('skyPanel');skyPanel();$('hLoc').appendChild(tmp.firstChild);return;}
-  var secs=[['hScore','Dá para observar hoje?'],['hAstro','Horóscopo do dia'],['hEv','Próximos eventos no seu céu'],['hPass','Estação Espacial e satélites'],['hApod','Foto astronômica do dia'],
+  var secs=[['hScore','Dá para observar hoje?'],['hEv','Próximos eventos no seu céu'],['hPass','Estação Espacial e satélites'],['hApod','Foto astronômica do dia'],
     ['hSlooh','Planejador do Slooh'],['hNovas','Exoplanetas descobertos recentemente'],['hRubin','Alertas do Observatório Vera Rubin'],['hTr','Trilhas de aprendizado'],['hDia','Diário de observação'],['hLuz','A luz que você vê']];
   h.innerHTML='<p class="vsub">'+dayStr(new Date())+' · local '+fmt(state.loc.lat,2)+'°, '+fmt(state.loc.lon,2)+'°</p><div class="hgrid">'+secs.map(function(s){return '<section class="hcard'+(s[0]==='hEv'||s[0]==='hDia'||s[0]==='hAstro'?' wide':'')+'"><h3>'+s[1]+'</h3><div id="'+s[0]+'"></div></section>';}).join('')+'</div>';
-  scoreCard($('hScore'));astroCard($('hAstro'));eventsCard($('hEv'));passesCard($('hPass'));apodCard($('hApod'));sloohCard($('hSlooh'),0);novasCard($('hNovas'));rubinCard($('hRubin'));trilhasCard($('hTr'));diarioCard($('hDia'));luzCard($('hLuz'));
+  scoreCard($('hScore'));eventsCard($('hEv'));passesCard($('hPass'));apodCard($('hApod'));sloohCard($('hSlooh'),0);novasCard($('hNovas'));rubinCard($('hRubin'));trilhasCard($('hTr'));diarioCard($('hDia'));luzCard($('hLuz'));
 }
 
 function loadPhotos(){dbAll('fotos',function(v){v.forEach(function(f){photos[f.k]=f.url;});if(v.length&&state.view!=='hoje')refresh();});}
