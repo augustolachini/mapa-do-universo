@@ -356,6 +356,14 @@ label.btn{background:transparent;border-color:rgba(255,255,255,.42);color:#fff;f
 .astro p{font-size:14.5px;margin:8px 0}.astro-vs{display:flex;align-items:center;gap:10px;margin:4px 0 8px}.astro-vs div{flex:1;background:#17171b;border-radius:8px;padding:10px 12px}
 .astro-vs small{display:block;color:#8d8d93;font-size:11px;text-transform:uppercase;letter-spacing:.06em}.astro-vs b{font-family:var(--serif);font-size:22px;font-weight:800}.astro-vs>span{color:var(--acc);font-weight:800;font-size:20px}
 .astro-vs.small b{font-size:17px}.achip{display:inline-block;background:#1d1d21;border:1px solid rgba(255,255,255,.16);border-radius:6px;padding:5px 10px;font-size:13px;color:#cfd0d4}.achip b{color:#fff}
+.signos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}@media (min-width:640px){.signos{grid-template-columns:repeat(6,1fr)}}
+.signos button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;font-size:12.5px;min-height:62px;background:#17171b;border-color:rgba(255,255,255,.16)}
+.signos button span{font-size:22px;line-height:1}.signos button.on{background:#fff;color:#000}
+.horo-h{display:flex;align-items:center;gap:12px}.horo-h b{display:block;font-family:var(--serif);font-weight:800;font-size:24px}.horo-h small{color:#8d8d93;font-size:12.5px}
+.horo-h .mini{margin-left:auto}.horo-s{font-size:38px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.25);border-radius:50%}
+.horo-g{font-size:16px;line-height:1.5;margin:12px 0}.horo-t{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.horo-t div{background:#17171b;border-radius:8px;padding:9px 12px;font-size:14px}.horo-t small{display:block;color:var(--acc);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+#hSel{margin-top:10px}
 </style>
 </head>
 <body>
@@ -2545,20 +2553,57 @@ function astroCard(el){
   var oph=rota.filter(function(r){return r.sym==='Oph';})[0];
   var nasc=lsGet('mapa.nasc'),nb=nasc?new Date(nasc+'T12:00'):null;
   var corpos=[['Moon','Lua'],['Mercury','Mercúrio'],['Venus','Vênus'],['Mars','Marte'],['Jupiter','Júpiter'],['Saturn','Saturno']];
-  el.innerHTML='<div class="astro"><div class="astro-vs"><div><small>Signo do calendário astrológico</small><b>'+sig+'</b></div><span>×</span><div><small>Onde o Sol está de verdade</small><b>'+sol.nome+'</b></div></div>'
+  el.innerHTML='<div id="horoBox"></div><h4 class="evm" style="text-transform:none;margin-top:16px">E no céu de verdade?</h4><div class="astro"><div class="astro-vs"><div><small>Signo do calendário astrológico</small><b>'+sig+'</b></div><span>×</span><div><small>Onde o Sol está de verdade</small><b>'+sol.nome+'</b></div></div>'
     +'<p>'+(sig===sol.nome?'Hoje os dois coincidem, o que é raro: por causa da <b>precessão</b>, o calendário astrológico está quase um signo inteiro atrasado em relação ao céu.':'Por causa da <b>precessão</b> (o eixo da Terra gira devagar, como um pião), o céu andou quase um signo inteiro desde que o zodíaco foi criado, há ~2 mil anos. Por isso o Sol de hoje está em '+sol.nome+', não em '+sig+'.')+'</p>'
     +(nb?'<div class="astro-vs small"><div><small>Seu signo (nascimento '+nb.toLocaleDateString('pt-BR')+')</small><b>'+signoDe(nb)+'</b></div><span>×</span><div><small>Constelação real do Sol nesse dia</small><b>'+consDe('Sun',nb).nome+'</b></div></div>'
       :'<p class="vsub">Salve sua data de nascimento em "A luz que você vê" para ver o seu "signo de verdade".</p>')
     +(oph?'<p><b>A 13ª constelação:</b> o Sol passa diante de Serpentário de '+dm(oph.ini)+' a '+dm(oph.fim)+', mas ela ficou fora dos 12 signos.</p>':'')
     +'<p class="vsub">Os 12 signos têm 30° cada; as constelações não: o Sol fica '+(dias.Vir||'?')+' dias em Virgem e só '+(dias.Sco||'?')+' em Escorpião.</p>'
     +'<h4 class="evm" style="text-transform:none">Onde estão hoje, de verdade</h4><div class="gchips">'+corpos.map(function(c){return '<span class="achip"><b>'+c[1]+'</b> em '+consDe(c[0],d).nome+'</span>';}).join('')+'</div>'
-    +'<p class="vsub" style="margin-top:10px">Cultura, não previsão: a astrologia não tem comprovação científica. As posições acima são calculadas com efemérides astronômicas.</p></div>';
+    +'<p class="vsub" style="margin-top:10px">Horóscopo é entretenimento: a astrologia não tem comprovação científica. As posições dos astros, essas sim, são calculadas com efemérides astronômicas.</p></div>';
+  horoCard($('horoBox'));
+}
+
+/* ---- horóscopo do dia (entretenimento): gerado a partir da Lua real de hoje e da relação dela com o signo escolhido ---- */
+var SIMB=['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'],ELEM=['fogo','terra','ar','água'];
+var DATAS=['21/3–19/4','20/4–20/5','21/5–20/6','21/6–22/7','23/7–22/8','23/8–22/9','23/9–22/10','23/10–21/11','22/11–21/12','22/12–19/1','20/1–18/2','19/2–20/3'];
+var HORO={
+ mesmo:{g:['A Lua passa pelo seu signo e deixa tudo mais à flor da pele. Bom dia para cuidar de você e começar algo seu.','Dia de protagonismo: o que depende só de você anda mais rápido.','Energia renovada. Use para tirar do papel um plano que estava parado.'],
+   a:['Você fica mais magnético; um gesto simples tem efeito grande.','Mostre o que sente sem rodeios.'],t:['Ótimo para se apresentar e defender uma ideia.','Iniciativa conta pontos hoje.']},
+ harm:{g:['Céu a favor: as coisas fluem sem tanto esforço. Aproveite para resolver pendências.','Dia leve, de boas conversas e boas coincidências.','A Lua num signo do seu elemento traz conforto e clareza.'],
+   a:['Clima gostoso para estar perto de quem você gosta.','Uma conversa sincera aproxima.'],t:['Parcerias rendem mais que trabalho solitário.','Bom momento para fechar algo que estava encaminhado.']},
+ apoio:{g:['Pequenas oportunidades aparecem; fique atento aos convites.','Dia bom para aprender algo novo ou trocar ideias.','Um empurrãozinho do céu para sair da rotina.'],
+   a:['Amizade pode virar algo mais, ou ficar ainda mais forte.','Humor leve ajuda em qualquer assunto do coração.'],t:['Networking e mensagens trazem resultado.','Organize a agenda: o dia rende.']},
+ tensao:{g:['Pode bater um pouco de impaciência. Respire antes de reagir.','Dia de pequenos atritos; escolha bem suas batalhas.','Nem tudo sai como planejado, e tudo bem: flexibilidade é a palavra.'],
+   a:['Evite discussões por detalhe; o tom importa mais que o conteúdo.','Dê espaço ao outro, e a você.'],t:['Revise antes de enviar; pressa gera retrabalho.','Prazos podem apertar; priorize o essencial.']},
+ oposto:{g:['A Lua no signo oposto ao seu pede equilíbrio entre o que você quer e o que os outros esperam.','Dia de olhar o outro lado da história.','Os relacionamentos ficam em evidência, para o bem e para o ajuste.'],
+   a:['Ouça mais do que fala; vale a pena.','Um reencontro ou uma conversa pendente pode aparecer.'],t:['Negocie: meio-termo vence hoje.','Trabalho em dupla pede alinhamento de expectativas.']},
+ neutro:{g:['Dia tranquilo, bom para colocar a casa e a cabeça em ordem.','Sem grandes emoções no céu: siga o seu ritmo.','Pequenos cuidados fazem diferença hoje.'],
+   a:['Carinho nos detalhes é o que conta.','Um programa simples pode ser o melhor do dia.'],t:['Foco no básico bem feito.','Bom dia para planejar a semana.']}};
+function hashStr(t){var h=2166136261;for(var i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function luaSigno(d){var e=Astronomy.EclipticGeoMoon(d).lon;return Math.floor(((e%360)+360)%360/30);}
+function horoscopo(sig,d){
+  var lua=luaSigno(d),dif=((lua-sig)%12+12)%12,rel=dif===0?'mesmo':dif===4||dif===8?'harm':dif===2||dif===10?'apoio':dif===3||dif===9?'tensao':dif===6?'oposto':'neutro';
+  var k=hashStr(d.toDateString()+sig),B=HORO[rel];function pick(a,o){return a[(k>>>o)%a.length];}
+  var ill=Astronomy.Illumination('Moon',d).phase_fraction,fase=Astronomy.MoonPhase(d);
+  return {lua:lua,rel:rel,g:pick(B.g,0),a:pick(B.a,3),t:pick(B.t,6),num:(k%60)+1,cor:['vermelho','verde','amarelo','azul','laranja','lilás','branco','dourado'][k%8],fase:moonName(fase),ill:ill};
+}
+function horoCard(box){
+  var sig=lsGet('mapa.signo');
+  var sel='<div class="signos">'+SIGNOS.map(function(n,i){return '<button data-sg="'+i+'" class="'+(sig===i?'on':'')+'"><span>'+SIMB[i]+'</span>'+n+'</button>';}).join('')+'</div>';
+  if(sig==null){box.innerHTML='<p class="vsub">Escolha o seu signo:</p>'+sel;}
+  else{var h=horoscopo(sig,new Date()),rot={mesmo:'Lua no seu signo',harm:'Lua em harmonia com você',apoio:'Lua dando apoio',tensao:'Lua em tensão',oposto:'Lua no signo oposto',neutro:'Lua em trânsito neutro'};
+    box.innerHTML='<div class="horo"><div class="horo-h"><span class="horo-s">'+SIMB[sig]+'</span><div><b>'+SIGNOS[sig]+'</b><small>'+DATAS[sig]+' · '+ELEM[sig%4]+'</small></div><button id="hTroca" class="mini">Trocar signo</button></div>'
+      +'<p class="horo-g">'+h.g+'</p><div class="horo-t"><div><small>Amor</small>'+h.a+'</div><div><small>Trabalho</small>'+h.t+'</div></div>'
+      +'<p class="vsub">'+rot[h.rel]+': hoje a Lua está em '+SIGNOS[h.lua]+' ('+h.fase.toLowerCase()+', '+fmt(h.ill*100,0)+'% iluminada) · número da sorte '+h.num+' · cor '+h.cor+'</p></div><div id="hSel" hidden>'+sel+'</div>';
+    $('hTroca').onclick=function(){var s2=$('hSel');s2.hidden=!s2.hidden;};}
+  box.querySelectorAll('[data-sg]').forEach(function(b){b.onclick=function(){lsSet('mapa.signo',+b.getAttribute('data-sg'));horoCard(box);};});
 }
 /* ---- montagem da aba ---- */
 function renderHoje(){
   var h=$('hoje');
   if(!state.loc){h.innerHTML='<div class="hcard"><h3>Bem-vindo</h3><div id="hLoc"></div></div>';var tmp=$('skyPanel');skyPanel();$('hLoc').appendChild(tmp.firstChild);return;}
-  var secs=[['hScore','Dá para observar hoje?'],['hAstro','Astronomia × astrologia'],['hEv','Próximos eventos no seu céu'],['hPass','Estação Espacial e satélites'],['hApod','Foto astronômica do dia'],
+  var secs=[['hScore','Dá para observar hoje?'],['hAstro','Horóscopo do dia'],['hEv','Próximos eventos no seu céu'],['hPass','Estação Espacial e satélites'],['hApod','Foto astronômica do dia'],
     ['hSlooh','Planejador do Slooh'],['hNovas','Exoplanetas descobertos recentemente'],['hRubin','Alertas do Observatório Vera Rubin'],['hTr','Trilhas de aprendizado'],['hDia','Diário de observação'],['hLuz','A luz que você vê']];
   h.innerHTML='<p class="vsub">'+dayStr(new Date())+' · local '+fmt(state.loc.lat,2)+'°, '+fmt(state.loc.lon,2)+'°</p><div class="hgrid">'+secs.map(function(s){return '<section class="hcard'+(s[0]==='hEv'||s[0]==='hDia'||s[0]==='hAstro'?' wide':'')+'"><h3>'+s[1]+'</h3><div id="'+s[0]+'"></div></section>';}).join('')+'</div>';
   scoreCard($('hScore'));astroCard($('hAstro'));eventsCard($('hEv'));passesCard($('hPass'));apodCard($('hApod'));sloohCard($('hSlooh'),0);novasCard($('hNovas'));rubinCard($('hRubin'));trilhasCard($('hTr'));diarioCard($('hDia'));luzCard($('hLuz'));
