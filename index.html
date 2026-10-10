@@ -2010,6 +2010,7 @@ var NOMES_VIZ={NGC0253:'Galáxia do Escultor',NGC5128:'Centaurus A',IC0342:'IC 3
 var MESSIER_PT={31:'Andrômeda',32:'M32',33:'Galáxia do Triângulo',51:'Galáxia do Rodamoinho',63:'Galáxia do Girassol',64:'Galáxia do Olho Negro',81:'Galáxia de Bode',82:'Galáxia do Charuto',83:'Cata-vento do Sul',94:'M94',101:'Galáxia do Cata-vento',104:'Galáxia do Sombrero',106:'M106',110:'M110'};
 function vizNome(n){var m=/^MESSIER0*(\d+)/.exec(n);if(m){var k=+m[1];return (MESSIER_PT[k]&&MESSIER_PT[k]!=='M'+k?MESSIER_PT[k]+' (M'+k+')':'M'+k);}return NOMES_VIZ[n]||n.replace(/^(NGC|UGC|IC|ESO|PGC|UGCA|DDO|KK|KKH|KKs)0*(\d)/,'$1 $2');}
 /* ---- nível 1: Grupo Local ---- */
+var LG_R0=4200;  // começa afastado: dá para ver o Grupo Local inteiro e as galáxias em volta
 function buildLG(){
   var sc=new THREE.Scene();sc.add(starfield());items.lg=[];
   GL.gal.forEach(function(g){var amp=g.id==='lmc'||g.id==='smc'||g.gen==='eliptica'?4:5;sc.add(galImpostor(g,amp));
@@ -2026,7 +2027,7 @@ function buildLG(){
     items.lg.push({key:'v|'+g[0],viz:g,get:function(){return v;},label:nm,pr:Math.max(0,-absM-12)+(fam?6:0),star:{dest:1}});});
   scenes.lgTex=tex;
   markers.lg=makeMarker();sc.add(markers.lg);scenes.lg=sc;
-  cam.lg.gt.copy(a.clone().lerp(b,0.42));cam.lg.tg.copy(cam.lg.gt);cam.lg.r=cam.lg.gr=950/Math.min(1,Math.pow(W/H,0.8));
+  cam.lg.gt.copy(a.clone().lerp(b,0.42));cam.lg.tg.copy(cam.lg.gt);cam.lg.ph=0.75;cam.lg.r=cam.lg.gr=LG_R0/Math.min(1,Math.pow(W/H,0.8));
 }
 // tocar numa galáxia vizinha: a câmera vai até ela e aparece uma versão no tamanho real (ampliável com zoom)
 function lgFocus(it){
@@ -2180,8 +2181,7 @@ var HUB=[
   {t:'Constelações',s:'As 88, com foto e em 3D.',a:'cons',go:function(){state.showDeep=false;state.exCat='cons';state.exSel=null;setView('deep');}},
   {t:'Galáxias',s:'Catálogo com fotos reais.',a:'viz',go:function(){state.showDeep=false;state.exCat='galaxia';state.exSel=null;setView('deep');}},
   {t:'Nebulosas',s:'Berçários de estrelas e restos de supernovas.',a:'neb',go:function(){state.showDeep=false;state.exCat='nebulosa';state.exSel=null;setView('deep');}},
-  {t:'Aglomerados',s:'De Plêiades a Ômega Centauri.',a:'agl',go:function(){state.showDeep=false;state.exCat='aglomerado';state.exSel=null;setView('deep');}},
-  {t:'Universo profundo',s:'Tudo em escala de distância, até 60 milhões de anos-luz.',a:'deep',go:function(){state.showDeep=true;state.exCat='galaxia';state.exSel=null;setView('deep');}}];
+  {t:'Aglomerados',s:'De Plêiades a Ômega Centauri.',a:'agl',go:function(){state.showDeep=false;state.exCat='aglomerado';state.exSel=null;setView('deep');}}];
 function showHub(){
   var h=$('exhub');if(!h)return;
   h.innerHTML='<h3 class="sh" style="margin-top:14px">Tudo para explorar</h3><div class="hubgrid">'+HUB.map(function(c,i){return '<button class="hubc'+(c.big?' big':'')+'" data-h="'+i+'"><span><b>'+c.t+'</b><small>'+c.s+'</small></span></button>';}).join('')+'</div>';
